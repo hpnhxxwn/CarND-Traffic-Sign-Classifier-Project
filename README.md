@@ -116,7 +116,7 @@ I googled German traffic signs and resized them to (32, 32, 3). Here are 6 examp
 
 accuracy = **83.3 %**
 
-In the label the speed limit 40km/h is missing, so the last image which is incorrectly classified should not be used in testing. Therefore, the accuracy should be 83.3 % (5 out of 6 known images) which is a bit higher than the accuracy of the test set (81.6 %)
+In the label the speed limit 40km/h is missing, so the image of speed limit 40 which is incorrectly classified should not be used in testing. Therefore, the accuracy should be 83.3 % (5 out of 6 known images) which is a bit higher than the accuracy of the test set (81.6 %)
 
 #### Softmax Probabilities
 
