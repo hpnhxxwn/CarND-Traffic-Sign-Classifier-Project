@@ -1,58 +1,142 @@
-## Project: Build a Traffic Sign Recognition Program
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+# Traffic Sign Classifier [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
-Overview
----
-In this project, you will use what you've learned about deep neural networks and convolutional neural networks to classify traffic signs. You will train and validate a model so it can classify traffic sign images using the [German Traffic Sign Dataset](http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset). After the model is trained, you will then try out your model on images of German traffic signs that you find on the web.
+**Build a Traffic Sign Recognition Project**
 
-We have included an Ipython notebook that contains further instructions 
-and starter code. Be sure to download the [Ipython notebook](https://github.com/udacity/CarND-Traffic-Sign-Classifier-Project/blob/master/Traffic_Sign_Classifier.ipynb). 
-
-We also want you to create a detailed writeup of the project. Check out the [writeup template](https://github.com/udacity/CarND-Traffic-Sign-Classifier-Project/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup. The writeup can be either a markdown file or a pdf document.
-
-To meet specifications, the project will require submitting three files: 
-* the Ipython notebook with the code
-* the code exported as an html file
-* a writeup report either as a markdown or pdf file 
-
-Creating a Great Writeup
----
-A great writeup should include the [rubric points](https://review.udacity.com/#!/rubrics/481/view) as well as your description of how you addressed each point.  You should include a detailed description of the code used in each step (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
-
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
-
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup.
-
-The Project
----
 The goals / steps of this project are the following:
-* Load the data set
+* Load the data set (see below for links to the project data set)
 * Explore, summarize and visualize the data set
 * Design, train and test a model architecture
 * Use the model to make predictions on new images
 * Analyze the softmax probabilities of the new images
 * Summarize the results with a written report
 
-### Dependencies
-This lab requires:
+### Jupyter Notebook
 
-* [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit)
+* Source Code: [Traffic_Sign_Classifier.ipynb](./Traffic_Sign_Classifier.ipynb) 
 
-The lab environment can be created with CarND Term1 Starter Kit. Click [here](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) for the details.
+### Data Set Summary & Exploration
 
-### Dataset and Repository
+#### Summary of the data set. 
 
-1. Download the data set. The classroom has a link to the data set in the "Project Instructions" content. This is a pickled dataset in which we've already resized the images to 32x32. It contains a training, validation and test set.
-2. Clone the project, which contains the Ipython notebook and the writeup template.
-```sh
-git clone https://github.com/udacity/CarND-Traffic-Sign-Classifier-Project
-cd CarND-Traffic-Sign-Classifier-Project
-jupyter notebook Traffic_Sign_Classifier.ipynb
-```
+* The size of training set is 34799
+* The size of the validation set is 4410
+* The size of test set is 12630
+* The shape of a traffic sign image is (32, 32, 3)
+* The number of unique classes/labels in the data set is 43
 
-### Requirements for Submission
-Follow the instructions in the `Traffic_Sign_Classifier.ipynb` notebook and write the project report using the writeup template as a guide, `writeup_template.md`. Submit the project code and writeup document.
+#### Exploratory visualization of the dataset.
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+Below bar chart shows the data distribution of the training data. Each bar represents one class (traffic sign) and how many samples are in the class. The mapping of traffic sign names to class id can be found here: [signnames.csv](./signnames.csv)
+
+![histogram](bar.png "histogram")
+
+Below shows traffic sign example per class.
+
+![original training images](classes.png "Traffic sign example per class")
+
+
+### Design and Test a Model Architecture
+
+#### Preprocessing (data augmentation)
+
+I kept the full colors of the images as I believe color plays an important role in image recognition, especially for traffic sign colors have meanings. Red means "warning", "don't" while blue can have neutral meaning.
+
+Following steps are applied to this image preprocessing part:
+
+1. Rotate image by random degrees in the range of -15 to 15 degrees. This is reasonable as in real world the traffic sign can be a bit off of its position.
+2. Randomly scale images to account for image distortions.
+3. Sharpen the images to make the edges clearer.
+4. Crop images to remove unnecessary noises around the traffic signs.
+5. Histogram equalization over Y channel of YCrCb color space to account for intensity unbalance.
+6. Random brightness to add darker light effect or brighter light effect on the images. This is to mimic morning, noon, afternoon and evening. 
+7. YUV normalization to normalize images over the three separate and independent components. Normalization makes the training faster and reduce the chance of getting stuck in local optima.
+
+Here is an example of an original traffic sign image and its augmented version.
+
+![alt text][augment.png]
+
+#### Model Architecture
+My model is inpired by GoogLeNet which consists inception module defined as the following picture: i
+![Inception](inception2.png)
+
+Below is the model architecture:
+
+| Layer         		|     Description	        					| 
+|:---------------------:|:---------------------------------------------:| 
+| Input         		| 32x32x3 RGB image   							| 
+| Convolution 1x1     	| 1x1 stride, same padding 	|
+| Convolution 5x5     	| 1x1 stride, same padding 	|
+| Inception layer     	| 	|
+| Max pool layer 2x2    	| 2x2 stride, valid padding 	|
+| Inception layer     	| 	|
+| Max pool layer 3x3    	| 2x2 stride, valid padding 	|
+| Convolution 1x1     	| 1x1 stride, same padding 	|
+| Dropout					|				0.5								|
+| Fully connected		|         									|
+| Softmax				|         									|
+ 
+
+#### Model Training
+
+I trained the model on AWS g2.2xlarge instance. 
+
+Here are my final training parameters:
+* EPOCHS = 15
+* BATCH_SIZE = 512
+* SIGMA = 0.1
+* OPIMIZER: AdamOptimizer (initial learning rate = 0.0005)
+
+My results after training the model:
+* Validation Accuracy = **96.89%**
+* Test Accuracy = **81.6%**
+
+#### Solution Approach
+
+My initial number of epoches is 20, but the validation accuracy did not go up after 15 epoches so I reduced to 15 epoches. The initial data preprocessing does not include image normalization/random brightness/histogram equalization, and the validation accuracy is always below 92 no matter how many number of epoches I trained. After adding these data preprocessing methods, the validation accuracy exceeds 95 in the fourth epoch.
+
+### Test on new images
+
+#### Acquiring New Images
+
+I googled German traffic signs and resized them to (32, 32, 3). Here are 6 examples I collected. 
+
+![new image 1](web-traffic-signs/01_speed_limit_30.jpg "new image 1")
+
+![new image 2](web-traffic-signs/12_priority_road.jpg "new image 2")
+
+![new image 3](web-traffic-signs/13_yield.jpg "new image 3")
+
+![new image 4](web-traffic-signs/14_stop.jpg "new image 4")
+
+![new image 5](web-traffic-signs/17_no_entry.jpg "new image 5")
+
+![new image 6](web-traffic-signs/38_keep_right.jpg "new image 6")
+
+#### Performance on New Images
+
+| Image			        |     Prediction		| 
+|:---------------------:|:---------------------:| 
+| Speed limit (30km/h)  | Speed limit (30km/h)  | 
+| Priority road   		| Stop 	|
+| Yield			| Yield					|
+| Stop		| Stop					|
+| No entry		| No entry  |
+| Keep right | Keep right |
+
+accuracy = **83.3 %**
+
+The accuracy 83.3 % is a bit higher than the accuracy of the test set (81.6 %)
+
+#### Softmax Probabilities
+
+**Prediction correct**
+
+The model is very confident at predicting these images.
+
+![stop softmax k-top 1](softmax.png "stop softmax k-top")
+![yield softmax k-top 1](softmax2.png "yield softmax k-top")
+![speed limit softmax k-top 1](softmax3.png "speed limit softmax k-top")
+![keep right softmax k-top 1](softmax4.png "keep right softmax k-top")
+![no entry softmax k-top 1](softmax5.png "no entry softmax k-top")
+![priority road softmax k-top 1](softmax6.png "priority road softmax k-top")
 
