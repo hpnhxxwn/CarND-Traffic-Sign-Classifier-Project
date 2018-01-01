@@ -56,7 +56,7 @@ Here is an example of an original traffic sign image and its augmented version.
 ![alt text][augment.png]
 
 #### Model Architecture
-My model is inpired by GoogLeNet which consists inception module defined as the following picture: i
+My model is inpired by [GoogLeNet](https://arxiv.org/pdf/1604.07316v1.pdf) which consists inception module defined as the following picture: i
 ![Inception](inception2.png)
 
 Below is the model architecture:
