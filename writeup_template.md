@@ -103,7 +103,12 @@ My initial number of epoches is 20, but the validation accuracy did not go up af
 
 I googled German traffic signs and resized them to (32, 32, 3). Here are 6 examples I collected. 
 
-![new images](test.png "new images")
+![new image 1](web-traffic-signs/01_speed_limit_30.jpg "new image 1")
+![new image 2](web-traffic-signs/12_priority_road.jpg "new image 2")
+![new image 3](web-traffic-signs/13_yield.jpg "new image 3")
+![new image 4](web-traffic-signs/14_stop.jpg "new image 4")
+![new image 5](web-traffic-signs/17_no_entry.jpg "new image 5")
+![new image 6](web-traffic-signs/38_keep_right.jpg "new image 6")
 
 #### Performance on New Images
 
